@@ -1,0 +1,109 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="default-src 'self'; script-src 'self' 'wasm-unsafe-eval'; worker-src 'self' blob:; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; media-src 'self' blob: mediastream:; connect-src 'self' ws: http://localhost:*"
+    />
+    <title>Air Writing Pro</title>
+  </head>
+  <body>
+    <main id="stage" class="mirror bg-camera">
+      <video id="video" muted playsinline></video>
+      <canvas id="camera"></canvas>
+      <div id="backdrop"></div>
+      <canvas id="ink"></canvas>
+      <canvas id="live"></canvas>
+    </main>
+
+    <!-- status pill (also the window drag handle) -->
+    <div id="status" class="glass pill">
+      <span class="brand"><span class="logo"></span>Air Writing Pro</span>
+      <span class="chip" id="st-gesture"><span class="dot"></span><b>Starting camera…</b></span>
+      <span class="chip" id="st-tool"><span class="dot"></span><b>Pen</b></span>
+      <span class="chip rec" id="st-rec" hidden><span class="dot"></span><b>REC 0:00</b></span>
+      <span class="hud" id="hud">— fps · — Hz · — ms</span>
+    </div>
+
+    <div id="winctl" class="glass">
+      <button class="btn sm" data-win="overlay" data-icon="overlay" title="Overlay mode — draw over any app (Ctrl/⌘+Shift+A)"></button>
+      <button class="btn sm" data-win="minimize" data-icon="minimize" title="Minimize"></button>
+      <button class="btn sm" data-win="maximize" data-icon="maximize" title="Maximize"></button>
+      <button class="btn sm danger" data-win="close" data-icon="close" title="Close"></button>
+    </div>
+
+    <!-- tool rail -->
+    <nav id="rail" class="glass">
+      <button class="btn" data-tool="pen" data-icon="pen" data-tip="Pen · P"></button>
+      <button class="btn" data-tool="marker" data-icon="marker" data-tip="Marker · M"></button>
+      <button class="btn" data-tool="highlighter" data-icon="highlighter" data-tip="Highlighter · H"></button>
+      <button class="btn" data-tool="neon" data-icon="neon" data-tip="Neon · N"></button>
+      <button class="btn" data-tool="laser" data-icon="laser" data-tip="Laser pointer · K"></button>
+      <button class="btn" data-tool="eraser" data-icon="eraser" data-tip="Eraser · E"></button>
+      <span class="divider"></span>
+      <button class="btn" data-tool="line" data-icon="line" data-tip="Line · L"></button>
+      <button class="btn" data-tool="arrow" data-icon="arrow" data-tip="Arrow · A"></button>
+      <button class="btn" data-tool="rect" data-icon="rect" data-tip="Rectangle · R"></button>
+      <button class="btn" data-tool="ellipse" data-icon="ellipse" data-tip="Ellipse · O"></button>
+      <button class="btn" data-tool="triangle" data-icon="triangle" data-tip="Triangle · T"></button>
+    </nav>
+
+    <!-- bottom dock -->
+    <footer id="dock" class="glass">
+      <div class="group" id="swatches"></div>
+      <span class="vdivider"></span>
+      <div class="group size">
+        <button class="btn sm" data-act="sizeDown" data-icon="minus" title="Smaller · ["></button>
+        <span class="size-dot" id="size-dot"></span>
+        <input type="range" id="size" min="1" max="40" step="1" aria-label="Brush size" />
+        <span class="size-val" id="size-val">6</span>
+        <button class="btn sm" data-act="sizeUp" data-icon="plus" title="Bigger · ]"></button>
+      </div>
+      <span class="vdivider"></span>
+      <div class="group">
+        <button class="btn" data-act="undo" data-icon="undo" title="Undo · Ctrl/⌘+Z"></button>
+        <button class="btn" data-act="redo" data-icon="redo" title="Redo · Ctrl/⌘+Shift+Z"></button>
+        <button class="btn" data-act="clear" data-icon="trash" title="Clear · C (or hold an open palm)"></button>
+      </div>
+      <span class="vdivider"></span>
+      <div class="group">
+        <button class="btn" data-menu="menu-bg" data-icon="background" title="Background · B"></button>
+        <button class="btn" data-act="record" data-icon="record" id="rec-btn" title="Record video · F9"></button>
+        <button class="btn" data-menu="menu-export" data-icon="export" title="Export &amp; files"></button>
+        <button class="btn" data-act="settings" data-icon="settings" title="Settings · ,"></button>
+        <button class="btn" data-act="help" data-icon="help" title="Gesture guide · F1"></button>
+      </div>
+    </footer>
+
+    <div id="hint" class="glass pill">Raise your hand in front of the camera</div>
+
+    <div id="menu-bg" class="menu glass">
+      <button class="menu-item" data-bg="camera">Camera</button>
+      <button class="menu-item" data-bg="blur">Blurred camera</button>
+      <button class="menu-item" data-bg="dim">Dimmed camera</button>
+      <button class="menu-item" data-bg="white">Whiteboard</button>
+      <button class="menu-item" data-bg="black">Blackboard</button>
+    </div>
+
+    <div id="menu-export" class="menu glass">
+      <button class="menu-item" data-act="exportPng" data-icon="image">PNG · transparent<span class="kbd">Ctrl+E</span></button>
+      <button class="menu-item" data-act="exportPngWhite" data-icon="image">PNG · whiteboard</button>
+      <button class="menu-item" data-act="exportPngBlack" data-icon="image">PNG · blackboard</button>
+      <button class="menu-item" data-act="exportSvg" data-icon="vector">SVG · vector</button>
+      <span class="hdivider"></span>
+      <button class="menu-item" data-act="saveProject" data-icon="save">Save project…<span class="kbd">Ctrl+S</span></button>
+      <button class="menu-item" data-act="openProject" data-icon="open">Open project…<span class="kbd">Ctrl+O</span></button>
+    </div>
+
+    <div id="radial"><div class="ring glass"></div><div class="radial-center" id="radial-label">Tools</div></div>
+
+    <aside id="settings" class="glass"></aside>
+
+    <div id="onboarding"></div>
+    <div id="toasts"></div>
+
+    <script type="module" src="./main.ts"></script>
+  </body>
+</html>

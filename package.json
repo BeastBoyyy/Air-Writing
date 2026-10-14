@@ -1,0 +1,29 @@
+{
+  "name": "air-writing-pro",
+  "productName": "Air Writing Pro",
+  "version": "2.0.0",
+  "description": "Draw in the air with your hand. Glass UI, 120Hz ink.",
+  "main": "out/main/index.js",
+  "author": "Air Writing Pro",
+  "license": "UNLICENSED",
+  "private": true,
+  "scripts": {
+    "postinstall": "node scripts/setup-assets.mjs",
+    "dev": "electron-vite dev",
+    "build": "electron-vite build",
+    "typecheck": "tsc --noEmit -p tsconfig.json",
+    "test": "vitest run",
+    "build:win": "electron-vite build && electron-builder --win",
+    "build:mac": "electron-vite build && electron-builder --mac"
+  },
+  "devDependencies": {
+    "@mediapipe/tasks-vision": "^1.1.0",
+    "electron": "^44.7.2",
+    "electron-builder": "^26.15.3",
+    "electron-vite": "^5.0.0",
+    "perfect-freehand": "^1.2.3",
+    "typescript": "^7.0.2",
+    "vite": "^7.3.7",
+    "vitest": "^5.0.4"
+  }
+}

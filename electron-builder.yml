@@ -1,0 +1,33 @@
+appId: com.airwritingpro.app
+productName: Air Writing Pro
+copyright: Copyright © 2026 Air Writing Pro
+directories:
+  output: dist
+  buildResources: build
+files:
+  - out/**
+  - package.json
+# The renderer (incl. MediaPipe WASM + model) is served from inside app.asar via the app:// protocol,
+# so the packaged app needs no network and no runtime besides itself.
+asar: true
+compression: maximum
+
+win:
+  icon: build/icon.png
+  target:
+    - target: portable # one self-contained .exe: double-click to run, nothing to install
+      arch: [x64]
+portable:
+  artifactName: AirWritingPro-${version}-portable.exe
+
+mac:
+  icon: build/icon.png
+  category: public.app-category.graphics-design
+  target:
+    - target: zip # unzip → AirWritingPro.app → double-click
+      arch: [universal]
+  identity: '-' # ad-hoc signature so Apple Silicon will launch it; replace with a Developer ID to notarize
+  hardenedRuntime: false
+  extendInfo:
+    NSCameraUsageDescription: Air Writing Pro uses your camera to track your hand so you can draw in the air.
+  artifactName: AirWritingPro-${version}-mac-universal.${ext}
